@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows.Forms;
 using DS4Windows;
 
@@ -21,9 +23,9 @@ namespace TesteBytesColored
 
         List<char> sequence = new List<char>(); //this list control the sequence of displaying
         private DS4Device ds4;
-        private byte leftStrenght = 100;
-        private byte rightStrenght = 100;
 
+
+        public enum Intensidade { ZERO = 0, FRACO = 255 / 4, MEDIO = 255 / 2, FORTE = 255 }
         public Form1()
         {
             InitializeComponent();
@@ -40,8 +42,10 @@ namespace TesteBytesColored
             cor[2] = Color.Purple;
             cor[3] = Color.Yellow;
             DS4Devices.findControllers();
-            ds4 = DS4Devices.getDS4Controllers().First();
-            ds4.StartUpdate();
+            ds4 = DS4Devices.getDS4Controllers().FirstOrDefault();
+            if (ds4 != null)
+                ds4.StartUpdate();
+
         }
 
 
@@ -56,6 +60,7 @@ namespace TesteBytesColored
             }
             else
             {
+               
                 //convert the texboxes values to designed types
                 try
                 {
@@ -161,14 +166,30 @@ namespace TesteBytesColored
                 update.Stop();
                 isPlaying = false;
                 index = 0;
-                ds4.setRumble(0, 0);
+                Vibrar(Intensidade.ZERO);
 
             }
 
 
 
         }
+        private void Acender(Color color)
+        {
+            if (ds4 != null)
+                ds4.LightBarColor = new DS4Color(color);
 
+        }
+        private void Vibrar(Intensidade intensidade)
+        {
+            if (ds4 != null)
+                ds4.setRumble((byte)intensidade, (byte)intensidade);
+
+        }
+        private void Vibrar(byte v1, byte v2)
+        {
+            if (ds4 != null)
+                ds4.setRumble(v1, v2);
+        }
         void SetActive(bool active)
         {
 
@@ -178,15 +199,14 @@ namespace TesteBytesColored
                 {
                     pbx[i].BackColor = cor[i];
                 }
-                ds4.LightBarColor = new DS4Color(Color.White);
-                ds4.setRumble(255, 255);
+                Acender(Color.White);
+                Vibrar(Intensidade.FORTE);
 
             }
             else // No one is active
             {
-                ds4.LightBarColor = new DS4Color(Color.Black);
-                ds4.setRumble(0, 0);
-
+                Acender(Color.Black);
+                Vibrar(Intensidade.ZERO);
                 foreach (var i in pbx)
                 {
                     i.BackColor = Color.White;
@@ -195,20 +215,20 @@ namespace TesteBytesColored
             }
         }
 
+
+
         void SetActive(int ind) //Activate only the box wich this id
         {
-            ds4.setRumble(0, 0);
+            Vibrar(Intensidade.ZERO);
             SetActive(false);
             pbx[ind].BackColor = cor[ind];
-            ds4.LightBarColor = new DS4Color(cor[ind]);
+            Acender(cor[ind]);
 
         }
 
         void SetActive(bool verde, bool azul, bool pink, bool amarelo) //Activate only those who is setted to true
         {
             SetActive(false);
-            ds4.setRumble(rightStrenght, leftStrenght);
-
             List<Color> colors = new List<Color>();
             if (verde)
             {
@@ -235,7 +255,7 @@ namespace TesteBytesColored
 
 
             GetMixedColor(out var c, colors.ToArray());
-            ds4.LightBarColor = new DS4Color(c);
+            Acender(c);
         }
 
         private void GetMixedColor(out Color result, params Color[] cores)
@@ -248,9 +268,11 @@ namespace TesteBytesColored
                 rgb[2] += item.B;
             }
             var sz = cores.Length;
-            ds4.setRumble((byte)(sz * 40), (byte)(sz * 40));
+            Vibrar((byte)(sz * 40), (byte)(sz * 40));
             result = Color.FromArgb(rgb[0] / sz, rgb[1] / sz, rgb[2] / sz);
 
         }
+
+
     }
 }
