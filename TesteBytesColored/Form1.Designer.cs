@@ -153,7 +153,7 @@
             this.sequenceText.Name = "sequenceText";
             this.sequenceText.Size = new System.Drawing.Size(363, 26);
             this.sequenceText.TabIndex = 0;
-            this.sequenceText.Text = "ZegDE";
+            this.sequenceText.Text = "ZedDE";
             // 
             // intervaloText
             // 
@@ -342,7 +342,7 @@
             // 
             // pictureBox11
             // 
-            this.pictureBox11.BackColor = System.Drawing.Color.White;
+            this.pictureBox11.BackColor = System.Drawing.Color.Purple;
             this.pictureBox11.Location = new System.Drawing.Point(142, 418);
             this.pictureBox11.Name = "pictureBox11";
             this.pictureBox11.Size = new System.Drawing.Size(41, 43);
@@ -351,7 +351,7 @@
             // 
             // pictureBox12
             // 
-            this.pictureBox12.BackColor = System.Drawing.Color.White;
+            this.pictureBox12.BackColor = System.Drawing.Color.Blue;
             this.pictureBox12.Location = new System.Drawing.Point(95, 418);
             this.pictureBox12.Name = "pictureBox12";
             this.pictureBox12.Size = new System.Drawing.Size(41, 43);
@@ -360,7 +360,7 @@
             // 
             // pictureBox13
             // 
-            this.pictureBox13.BackColor = System.Drawing.Color.Green;
+            this.pictureBox13.BackColor = System.Drawing.Color.White;
             this.pictureBox13.Location = new System.Drawing.Point(48, 418);
             this.pictureBox13.Name = "pictureBox13";
             this.pictureBox13.Size = new System.Drawing.Size(41, 43);
@@ -457,7 +457,7 @@
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(60, 20);
             this.label10.TabIndex = 37;
-            this.label10.Text = "ZegDE";
+            this.label10.Text = "ZedDE";
             // 
             // label11
             // 

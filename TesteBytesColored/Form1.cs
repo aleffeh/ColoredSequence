@@ -4,21 +4,25 @@ using System.Drawing;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using DS4Windows;
 
 namespace TesteBytesColored
 {
 
     public partial class Form1 : Form
     {
-        
+
         int index = 0;
         bool isPlaying = false;
 
         Color[] cor = new Color[4];
         PictureBox[] pbx = new PictureBox[4];
 
-        
+
         List<char> sequence = new List<char>(); //this list control the sequence of displaying
+        private DS4Device ds4;
+        private byte leftStrenght = 100;
+        private byte rightStrenght = 100;
 
         public Form1()
         {
@@ -35,7 +39,9 @@ namespace TesteBytesColored
             cor[1] = Color.Blue;
             cor[2] = Color.Purple;
             cor[3] = Color.Yellow;
-
+            DS4Devices.findControllers();
+            ds4 = DS4Devices.getDS4Controllers().First();
+            ds4.StartUpdate();
         }
 
 
@@ -155,6 +161,8 @@ namespace TesteBytesColored
                 update.Stop();
                 isPlaying = false;
                 index = 0;
+                ds4.setRumble(0, 0);
+
             }
 
 
@@ -163,40 +171,86 @@ namespace TesteBytesColored
 
         void SetActive(bool active)
         {
+
             if (active) // All 4 is active
             {
                 for (int i = 0; i < pbx.Length; i++)
                 {
                     pbx[i].BackColor = cor[i];
                 }
+                ds4.LightBarColor = new DS4Color(Color.White);
+                ds4.setRumble(255, 255);
+
             }
             else // No one is active
             {
+                ds4.LightBarColor = new DS4Color(Color.Black);
+                ds4.setRumble(0, 0);
+
                 foreach (var i in pbx)
                 {
                     i.BackColor = Color.White;
                 }
+
             }
         }
 
         void SetActive(int ind) //Activate only the box wich this id
         {
+            ds4.setRumble(0, 0);
             SetActive(false);
             pbx[ind].BackColor = cor[ind];
+            ds4.LightBarColor = new DS4Color(cor[ind]);
+
         }
 
-        void SetActive(bool verde, bool azul,bool pink, bool amarelo) //Activate only those who is setted to true
+        void SetActive(bool verde, bool azul, bool pink, bool amarelo) //Activate only those who is setted to true
         {
             SetActive(false);
+            ds4.setRumble(rightStrenght, leftStrenght);
+
+            List<Color> colors = new List<Color>();
             if (verde)
+            {
                 pbx[0].BackColor = cor[0];
+                colors.Add(cor[0]);
+            }
             if (azul)
+            {
                 pbx[1].BackColor = cor[1];
+                colors.Add(cor[1]);
+
+            }
             if (pink)
+            {
                 pbx[2].BackColor = cor[2];
+                colors.Add(cor[2]);
+
+            }
             if (amarelo)
+            {
+                colors.Add(cor[3]);
                 pbx[3].BackColor = cor[3];
+            }
+
+
+            GetMixedColor(out var c, colors.ToArray());
+            ds4.LightBarColor = new DS4Color(c);
         }
 
+        private void GetMixedColor(out Color result, params Color[] cores)
+        {
+            int[] rgb = new int[3];
+            foreach (var item in cores)
+            {
+                rgb[0] += item.R;
+                rgb[1] += item.G;
+                rgb[2] += item.B;
+            }
+            var sz = cores.Length;
+            ds4.setRumble((byte)(sz * 40), (byte)(sz * 40));
+            result = Color.FromArgb(rgb[0] / sz, rgb[1] / sz, rgb[2] / sz);
+
+        }
     }
 }
